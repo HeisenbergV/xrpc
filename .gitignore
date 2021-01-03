@@ -1,0 +1,40 @@
+*
+!*.*
+!*/
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+go.sum
+.idea/
+*.bak
+.DS_Store
+dump.rdb
+*.log
+.vscode
+*.yaml
+*.o
+bin
+.idea/
+*.iml
+*.classes
+*.jar
+*.war
+*.ear
+target
+.settings
+.classpath
+.project
+.metadata/
+classes/
+logs/
+*.log
+rebel.xml

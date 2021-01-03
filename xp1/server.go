@@ -1,4 +1,4 @@
-package server
+package xrpc
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"log"
 	"net"
 	"reflect"
-	"xp1/codec"
+	"xrpc/codec"
 )
 
 type Server struct {
@@ -34,6 +34,7 @@ func (server *Server) serveCodec(cc codec.Codec) {
 		req, err := server.readRequest(cc)
 		if err != nil {
 			if req == nil {
+				fmt.Printf("close服务 %s \n", err)
 				break
 			}
 			req.h.Error = err.Error()
@@ -42,7 +43,7 @@ func (server *Server) serveCodec(cc codec.Codec) {
 		}
 		go server.handleRequest(cc, req)
 	}
-	_ = cc.Close()
+	cc.Close()
 }
 
 type request struct {

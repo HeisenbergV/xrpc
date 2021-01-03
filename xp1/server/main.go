@@ -5,7 +5,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
-	"xp1/server"
+	"xrpc/server"
 )
 
 func main() {
