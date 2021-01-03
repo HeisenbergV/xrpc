@@ -20,6 +20,16 @@ func (f Foo) sum(args Args, reply *int) error {
 	return nil
 }
 
+type People struct {
+	Age  int
+	Name string
+}
+
+func (p *People) Hello(msg string, reply *string) error {
+	*reply = msg + "," + p.Name
+	return nil
+}
+
 func _assert(condition bool, msg string, v ...interface{}) {
 	if !condition {
 		panic(fmt.Sprintf("assertion failed: "+msg, v...))
@@ -27,11 +37,8 @@ func _assert(condition bool, msg string, v ...interface{}) {
 }
 
 func TestNewService(t *testing.T) {
-	var foo Foo
-	s := newService(&foo)
-	_assert(len(s.method) == 1, "wrong service Method, expect 1, but got %d", len(s.method))
-	mType := s.method["Sum"]
-	_assert(mType != nil, "wrong Method, Sum shouldn't nil")
+	s := newService(&People{Age: 11, Name: "zuo"})
+	fmt.Println(s)
 }
 
 func TestMethodType_Call(t *testing.T) {
