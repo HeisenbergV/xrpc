@@ -5,7 +5,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
-	"xrpc/server"
+	"xrpc"
 )
 
 func main() {
@@ -14,7 +14,7 @@ func main() {
 		log.Fatal("network error:", err)
 	}
 	log.Println("start rpc server on", l.Addr())
-	ser := server.NewServer(l)
+	ser := xrpc.NewServer(l)
 	ser.Run()
 
 	c := make(chan os.Signal, 1)

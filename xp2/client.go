@@ -1,8 +1,4 @@
-// Copyright 2009 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-package xp2
+package xrpc
 
 import (
 	"encoding/json"
@@ -15,7 +11,6 @@ import (
 	"xrpc/codec"
 )
 
-// Call represents an active RPC.
 type Call struct {
 	Seq           uint64
 	ServiceMethod string      // format "<service>.<method>"
