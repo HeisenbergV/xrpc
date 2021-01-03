@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"time"
 	"xrpc/codec"
 )
 
@@ -77,7 +78,7 @@ func (server *Server) serveCodec(cc codec.Codec) {
 			server.sendResponse(cc, req.h, invalidRequest)
 			continue
 		}
-		go server.handleRequest(cc, req)
+		go server.handleRequest(cc, req, DefaultOption.HandleTimeout)
 	}
 	cc.Close()
 }
@@ -132,14 +133,34 @@ func (server *Server) sendResponse(cc codec.Codec, h *codec.Header, body interfa
 	}
 }
 
-func (server *Server) handleRequest(cc codec.Codec, req *request) {
-	err := req.svc.call(req.mtype, req.argv, req.replyv)
-	if err != nil {
-		req.h.Error = err.Error()
-		server.sendResponse(cc, req.h, invalidRequest)
+func (server *Server) handleRequest(cc codec.Codec, req *request, timeout time.Duration) {
+	called := make(chan struct{})
+	sent := make(chan struct{})
+	go func() {
+		err := req.svc.call(req.mtype, req.argv, req.replyv)
+		called <- struct{}{}
+		if err != nil {
+			req.h.Error = err.Error()
+			server.sendResponse(cc, req.h, invalidRequest)
+			sent <- struct{}{}
+			return
+		}
+		server.sendResponse(cc, req.h, req.replyv.Interface())
+		sent <- struct{}{}
+	}()
+
+	if timeout == 0 {
+		<-called
+		<-sent
 		return
 	}
-	server.sendResponse(cc, req.h, req.replyv.Interface())
+	select {
+	case <-time.After(timeout):
+		req.h.Error = fmt.Sprintf("rpc server: request handle timeout: expect within %s", timeout)
+		server.sendResponse(cc, req.h, invalidRequest)
+	case <-called:
+		<-sent
+	}
 }
 
 func (server *Server) Run() {

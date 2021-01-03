@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"time"
 	"xrpc"
 )
 
@@ -13,7 +15,8 @@ func main() {
 	for i := 0; i < 5; i++ {
 		args := fmt.Sprintf("sync req %d", i)
 		var reply string
-		if err := client.Call("People.Hello", args, &reply); err != nil {
+		ctx, _ := context.WithTimeout(context.Background(), time.Second)
+		if err := client.Call(ctx, "People.Hello", args, &reply); err != nil {
 			log.Fatal("call Foo.Sum error:", err)
 		}
 		log.Println("reply:", reply)

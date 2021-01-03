@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"time"
 	"xrpc"
 )
 
@@ -15,6 +16,7 @@ type People struct {
 func (p *People) Hello(msg string, reply *string) error {
 	*reply = msg + "," + "123"
 	fmt.Println("client send: " + msg)
+	time.Sleep(2 * time.Second)
 	return nil
 }
 
