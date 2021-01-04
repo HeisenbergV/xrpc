@@ -71,8 +71,11 @@ Server: Apache 0.84
 3. 因为良好的rpc调用是面向服务的封装，针对服务的可用性和效率等都做了优化。单纯使用http调用则缺少了这些特性。
 简单来说成熟的rpc库相对http容器，更多的是封装了“服务发现”，"负载均衡"，“熔断降级”一类面向服务的高级特性。可以这么理解，rpc框架是面向服务的更高级的封装。如果把一个http servlet容器上封装一层服务发现和函数代理调用，那它就已经可以做一个rpc框架了。
 
+## rpc和restful
 
-## http1 和HTTp2
+## grpc
+
+## http1和http2
 - 新的二进制格式（Binary Format）：HTTP1.x的解析是基于文本。基于文本协议的格式解析存在天然缺陷，文本的表现形式有多样性，要做到健壮性考虑的场景必然很多，二进制则不同，只认0和1的组合。基于这种考虑HTTP2.0的协议解析决定采用二进制格式，实现方便且健壮。
 
 - 多路复用（MultiPlexing）：即连接共享，即每一个request都是是用作连接共享机制的。一个request对应一个id，这样一个连接上可以有多个request，每个连接的request可以随机的混杂在一起，接收方可以根据request的 id将request再归属到各自不同的服务端请求里面。
@@ -99,7 +102,7 @@ Server: Apache 0.84
 这样当配合非阻塞的socket使用时，只有当系统通知我哪个描述符可读了，我才去执行read操作，而不必浪费时间去阻塞等待。
 多个描述符的I/O操作都能在一个线程内并发交替地顺序完成，这就叫I/O多路复用，这里的“复用”指的是复用同一个线程
 
-## Restful
+
 
 ## grpc
 ### 两种调用方式
@@ -111,10 +114,27 @@ Server: Apache 0.84
 ### 交互流程
 - MetaData
 在建立连接，或者每次请求的时候 使用metadata来建立 数据规则（超时，解析方式等）
+元数据是用来描述数据的数据（Data that describes other data）。
+
+在http请求当中我们可以设置header用来传递数据，grpc底层采用http2协议也是支持传递数据的，采用的是metadata。 Metadata 对于 gRPC 本身来说透明， 它使得 client 和 server 能为对方提供本次调用的信息。就像一次 http 请求的 RequestHeader 和 ResponseHeader，http header 的生命周期是一次 http 请求， Metadata 的生命周期则是一次 RPC 调用
+
+type MD map[string][]string
+
+其中所有的 KEY 均会被默认转换成小写， 也就是 “hello” 和 “Hello” 是同一个 key
 
 - 认证
+在SSL/TLS出现之前，很多应用层协议（http、ftp、smtp等）都存在着网络安全问题，例如大家所熟知的http协议，在传输过程中使用的是明文信息，传输报文一旦被截获便会泄露传输内容；传输过程中报文如果被篡改，无法轻易发现；无法保证消息交换的对端身份的可靠性。为了解决此类问题，人们在应用层和传输层之间加入了SSL/TLS协议。
+
+TLS的作用
+TLS协议主要解决如下三个网络安全问题。
+
+保密(message privacy)，保密通过加密encryption实现，所有信息都加密传输，第三方无法嗅探；
+完整性(message integrity)，通过MAC校验机制，一旦被篡改，通信双方会立刻发现；
+认证(mutual authentication)，双方认证,双方都可以配备证书，防止身份被冒充；
 
 - 链路追踪
+
+微服务架构是通过业务来划分服务的，使用 REST 调用。对外暴露的一个接口，可能需要很多个服务协同才能完成这个接口功能，如果链路上任何一个服务出现问题或者网络超时，都会形成导致接口调用失败。随着业务的不断扩张，服务之间互相调用会越来越复杂。
 
 
 ## grpc 请求超时 & Context
