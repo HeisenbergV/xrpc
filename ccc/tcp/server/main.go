@@ -6,8 +6,7 @@ import (
 )
 
 func main() {
-	//1.建立监听端口
-	listen, err := net.Listen("tcp", "0.0.0.0:20000")
+	listen, err := net.Listen("tcp", "0.0.0.0:8888")
 	if err != nil {
 		fmt.Println("listen failed, err:", err)
 		return
@@ -16,21 +15,16 @@ func main() {
 	fmt.Println("listen  tcp Start...:")
 
 	for {
-		//2.接收客户端的链接
 		conn, err := listen.Accept()
 		if err != nil {
 			fmt.Printf("accept failed, err:%v\n", err)
 			continue
 		}
-		//3.开启一个Goroutine，处理链接
 		go process(conn)
 	}
 }
 
-//处理请求，类型就是net.Conn
 func process(conn net.Conn) {
-
-	//处理结束后关闭链接
 	defer conn.Close()
 	for {
 		var buf [128]byte
@@ -41,5 +35,4 @@ func process(conn net.Conn) {
 		}
 		fmt.Printf("recv from client, content:%v\n", string(buf[:n]))
 	}
-
 }
